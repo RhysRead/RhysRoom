@@ -55,7 +55,7 @@ class ModuleManager(object):
         count = 0
         for file_name in files:
             # Ensuring that the file is not a directory. Will trigger an error on files with no file type allocated.
-            if '.' not in list(file_name):
+            if '.' not in list(file_name) or file_name == "ModuleTemplate.py":
                 continue
             self.load_module(file_name)
             count += 1
