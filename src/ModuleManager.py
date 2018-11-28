@@ -16,7 +16,9 @@ MODULE_FOLDER_LOCATION = "/../Modules/"
 
 
 class ModuleManager(object):
-    def __init__(self, auto_load=True, verbose=True):
+    def __init__(self, main, auto_load=True, verbose=True):
+        self.__main = main
+
         self.__file_path = os.path.dirname(os.path.realpath(__file__))
         self.__modules = []
 
@@ -24,6 +26,18 @@ class ModuleManager(object):
             count = self.load_modules_from_module_folder()
             if verbose:
                 logging.info("{} modules loaded.".format(count))
+
+    def get_module(self, module_name: str):
+        """
+        Used to retrieve a module from the module manager with the modules name.
+        :param module_name:
+        :return:
+        """
+        for module in self.__modules:
+            if module.get_name() == module_name:
+                return module
+
+        return None
 
     def start_modules(self):
         """
@@ -42,7 +56,7 @@ class ModuleManager(object):
         real_module_path = self.__file_path + MODULE_FOLDER_LOCATION + module_name
         module = SourceFileLoader("Module", real_module_path).load_module()
         # Todo: Add exception handling for failure to load modules.
-        self.__modules.append(module.Module())
+        self.__modules.append(module.Module(self.__main))
 
     def load_modules_from_module_folder(self, verbose=True):
         """

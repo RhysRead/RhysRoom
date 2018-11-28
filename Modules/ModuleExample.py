@@ -11,8 +11,11 @@ from Modules.ModuleTemplate import ModuleTemplate
 
 
 class Module(ModuleTemplate):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, main):
+        super().__init__(main)
 
     def start(self):
         print("Hello world!")
+
+    def get_name(self):
+        return "ModuleExample"

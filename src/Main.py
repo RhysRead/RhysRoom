@@ -14,10 +14,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 class Main(object):
     def __init__(self):
-        self.__module_manager = ModuleManager()
+        self._module_manager = ModuleManager(self)
 
     def start(self):
-        self.__module_manager.start_modules()
+        self._module_manager.start_modules()
 
 
 if __name__ == "__main__":

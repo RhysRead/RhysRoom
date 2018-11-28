@@ -11,9 +11,14 @@ from abc import ABC, abstractmethod
 
 
 class ModuleTemplate(ABC):
-    def __init__(self):
+    def __init__(self, main):
         super().__init__()
+        self.__main = main
 
     @abstractmethod
     def start(self):
+        pass
+
+    @abstractmethod
+    def get_name(self):
         pass
