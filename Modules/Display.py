@@ -21,15 +21,22 @@ class Module(ModuleTemplate):
 
     def start(self):
         logging.info('Starting GUI.')
-        display = Display()
+        display = Display(self.main)
+
+        self.main.thread_manager.add_async_thread(display.random_loop)
+        self.main.thread_manager.add_async_thread(display.battery_loop)
+
+        self.main.thread_manager.add_sync_thread(display.start)
 
     def get_name(self):
         return "Display"
 
 
 class Display(object):
-    def __init__(self):
+    def __init__(self, main):
         self.active = True
+
+        self.main = main
 
         self.__root = tk.Tk()
         self.__root.title('RhysRoom software')
@@ -51,9 +58,7 @@ class Display(object):
                            command=self.__exit)
         button.pack()
 
-        self.__frame.after(0, self.__random_loop)
-        self.__frame.after(0, self.__battery_loop)
-
+    def start(self):
         self.__root.mainloop()
 
     def __update(self):
@@ -61,12 +66,9 @@ class Display(object):
             return
         self.__root.update()
 
-    def __random_loop(self):
+    def random_loop(self):
         # Todo: Research threading module a bit more to be more confident with threads and cores
-        while True:
-            if not self.active:
-                break
-
+        while self.active:
             self.__update()
 
             # Broad exception clause to handle unexpected closure
@@ -76,11 +78,8 @@ class Display(object):
                 pass
             time.sleep(0.01)
 
-    def __battery_loop(self):
-        while True:
-            if not self.active:
-                break
-
+    def battery_loop(self):
+        while self.active:
             self.__update()
 
             # Broad exception clause to handle unexpected closure
@@ -89,10 +88,10 @@ class Display(object):
                 self.__battery_level.config(text=str(battery.percent))
             except:
                 pass
-            self.__frame.after(60000, self.__battery_loop)
 
     def __exit(self):
         self.active = False
+        self.main.active = False
         self.__root.destroy()
 
 

@@ -8,6 +8,7 @@ __copyright__ = "Copyright 2018, Rhys Read"
 import logging
 
 from ModuleManager import ModuleManager
+from ThreadManager import ThreadManager
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -15,9 +16,15 @@ logging.basicConfig(level=logging.DEBUG)
 class Main(object):
     def __init__(self):
         self._module_manager = ModuleManager(self)
+        self.thread_manager = ThreadManager()
+
+        self.active = True
 
     def start(self):
         self._module_manager.start_modules()
+
+        while self.active:
+            self.thread_manager.check_scheduled()
 
 
 if __name__ == "__main__":
