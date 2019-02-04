@@ -9,6 +9,7 @@ import logging
 
 import os
 from importlib.machinery import SourceFileLoader
+import threading
 
 MODULE_FOLDER_LOCATION = "/../Modules/"
 
@@ -21,6 +22,8 @@ class ModuleManager(object):
 
         self.__file_path = os.path.dirname(os.path.realpath(__file__))
         self.__modules = []
+
+        self.__modules_threads = []
 
         if auto_load:
             count = self.load_modules_from_module_folder()
@@ -45,7 +48,16 @@ class ModuleManager(object):
         :return:
         """
         for module in self.__modules:
-            module.start()
+            if not module.run_as_thread:
+                module.start()
+                continue
+
+            thread = threading.Thread(target=module.start, daemon=True)
+            thread.start()
+            self.__modules_threads.append(thread)
+
+        for thread in self.__modules_threads:
+            thread.join()
 
     def load_module(self, module_name: str):
         """

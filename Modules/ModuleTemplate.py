@@ -14,6 +14,7 @@ class ModuleTemplate(ABC):
     def __init__(self, main):
         super().__init__()
         self.__main = main
+        self.run_as_thread = False
 
     @abstractmethod
     def start(self):

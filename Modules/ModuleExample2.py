@@ -15,7 +15,8 @@ class Module(ModuleTemplate):
         super().__init__(main)
 
     def start(self):
-        print("Hello world again!")
+        # print("Hello world again!")
+        pass
 
     def get_name(self):
         return "ModuleExample2"
