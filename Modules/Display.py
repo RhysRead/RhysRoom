@@ -8,6 +8,7 @@ __copyright__ = "Copyright 2018, Rhys Read"
 import logging
 import tkinter as tk
 import time
+import datetime
 
 from Modules.ModuleTemplate import ModuleTemplate
 
@@ -50,9 +51,19 @@ class Display(object):
         self.__label3 = tk.Label(self.__root, text='Disabled Modules:', font='Helvetica 16 bold')
         self.__label3.grid(row=1, column=2)
 
-        self.time0 = tk.Label(self.__root, text=time.strftime('%H:%M:%S'), font='Helvetica 100 bold', fg='Navy')
+        self.time0 = tk.Label(self.__root,
+                              text=time.strftime('%H:%M:%S'),
+                              font='Helvetica 100 bold',
+                              fg='Navy')
         self.main.thread_manager.add_async_thread(time_loop, args=(self,))
         self.time0.grid(row=2, column=4)
+
+        self.date0 = tk.Label(self.__root,
+                              text=datetime.datetime.today().strftime('%Y-%m-%d'),
+                              font='Helvetica 60',
+                              fg='Navy')
+        self.main.thread_manager.add_async_thread(date_loop, args=(self,))
+        self.date0.grid(row=3, column=4)
 
         self.__events0 = tk.Listbox(self.__root)
         self.__events0.grid(row=2, column=0)
@@ -106,3 +117,9 @@ def time_loop(display_module: Display):
         time.sleep(0.01)
         display_module.update()
 
+
+def date_loop(display_module: Display):
+    while display_module.main.active:
+        display_module.date0.config(text=datetime.datetime.today().strftime('%d-%m-%Y'))
+        time.sleep(60)
+        display_module.update()

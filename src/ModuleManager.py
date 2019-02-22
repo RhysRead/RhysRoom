@@ -70,7 +70,7 @@ class ModuleManager(object):
         # Todo: Add exception handling for failure to load modules.
         self.modules.append(module.Module(self.__main))
 
-    def load_modules_from_module_folder(self, verbose=True):
+    def load_modules_from_module_folder(self):
         """
         Used to load modules from the module folder. Will iterate through all files in the directory and attempt to load
         them.
