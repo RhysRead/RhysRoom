@@ -39,6 +39,10 @@ class Display(object):
         self.__root = tk.Tk()
         self.__root.title('RhysRoom software')
 
+        self.start_time = time.time()
+
+        # Label
+
         self.__label0 = tk.Label(self.__root, text='RhysRoom Software', font='Helvetica 18 bold')
         self.__label0.grid(row=0, column=1)
 
@@ -50,6 +54,8 @@ class Display(object):
 
         self.__label3 = tk.Label(self.__root, text='Disabled Modules:', font='Helvetica 16 bold')
         self.__label3.grid(row=1, column=2)
+
+        # Dynamic label
 
         self.time0 = tk.Label(self.__root,
                               text=time.strftime('%H:%M:%S'),
@@ -65,9 +71,17 @@ class Display(object):
         self.main.thread_manager.add_async_thread(date_loop, args=(self,))
         self.date0.grid(row=3, column=4)
 
+        self.uptime0 = tk.Label(self.__root,
+                                text='Uptime: {}',
+                                font='Helvetica 30 ',
+                                fg='Navy')
+        self.main.thread_manager.add_async_thread(uptime_loop, args=(self,))
+        self.uptime0.grid(row=3, column=1)
+
+        # Dynamic listbox
+
         self.__events0 = tk.Listbox(self.__root)
         self.__events0.grid(row=2, column=0)
-
         # Todo: Test if event limiter even works
         self.__events0_amount = 0
 
@@ -77,6 +91,7 @@ class Display(object):
         self.__disabled_modules0 = tk.Listbox(self.__root)
         self.__disabled_modules0.grid(row=2, column=2)
 
+        # Updates active modules listbox
         for module in main.module_manager.modules:
             self.add_active_module(module.get_name())
 
@@ -123,3 +138,16 @@ def date_loop(display_module: Display):
         display_module.date0.config(text=datetime.datetime.today().strftime('%d-%m-%Y'))
         time.sleep(60)
         display_module.update()
+
+
+def uptime_loop(display_module: Display):
+    while display_module.main.active:
+        elapsed_time = time.time() - display_module.start_time
+
+        unformatted_time = [elapsed_time // 216000, elapsed_time // 3600, elapsed_time % 60]
+
+        formatted_time = ':'.join([str(round(i)) for i in unformatted_time])
+
+        display_module.uptime0.config(text='Uptime: {}'.format(formatted_time))
+
+        time.sleep(1)
