@@ -144,7 +144,7 @@ def uptime_loop(display_module: Display):
     while display_module.main.active:
         elapsed_time = time.time() - display_module.start_time
 
-        unformatted_time = [elapsed_time // 216000, elapsed_time // 3600, elapsed_time % 60]
+        unformatted_time = [elapsed_time // 3600, elapsed_time // 60, elapsed_time % 60]
 
         formatted_time = ':'.join([str(round(i)) for i in unformatted_time])
 
