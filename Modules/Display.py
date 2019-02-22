@@ -125,6 +125,8 @@ class Display(object):
         self.main.active = False
 
 
+# Dynamic label methods
+
 # Todo: Re-do this code so that it's not spaghetti, it's a bit hacky right now
 def time_loop(display_module: Display):
     while display_module.main.active:
@@ -143,7 +145,6 @@ def date_loop(display_module: Display):
 def uptime_loop(display_module: Display):
     while display_module.main.active:
         elapsed_time = time.time() - display_module.start_time
-
         unformatted_time = [elapsed_time // 3600, elapsed_time // 60, elapsed_time % 60]
 
         formatted_time = ':'.join([str(round(i)) for i in unformatted_time])
