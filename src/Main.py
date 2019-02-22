@@ -15,13 +15,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 class Main(object):
     def __init__(self):
-        self._module_manager = ModuleManager(self)
+        self.module_manager = ModuleManager(self)
         self.thread_manager = ThreadManager()
 
         self.active = True
 
     def start(self):
-        self._module_manager.start_modules()
+        self.module_manager.start_modules()
 
         while self.active:
             self.thread_manager.check_scheduled()

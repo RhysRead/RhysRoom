@@ -21,7 +21,7 @@ class ModuleManager(object):
         self.__main = main
 
         self.__file_path = os.path.dirname(os.path.realpath(__file__))
-        self.__modules = []
+        self.modules = []
 
         self.__modules_threads = []
 
@@ -36,7 +36,7 @@ class ModuleManager(object):
         :param module_name:
         :return:
         """
-        for module in self.__modules:
+        for module in self.modules:
             if module.get_name() == module_name:
                 return module
 
@@ -47,7 +47,7 @@ class ModuleManager(object):
         Used to iterate through and start all loaded modules.
         :return:
         """
-        for module in self.__modules:
+        for module in self.modules:
             if not module.run_as_thread:
                 module.start()
                 continue
@@ -68,7 +68,7 @@ class ModuleManager(object):
         real_module_path = self.__file_path + MODULE_FOLDER_LOCATION + module_name
         module = SourceFileLoader("Module", real_module_path).load_module()
         # Todo: Add exception handling for failure to load modules.
-        self.__modules.append(module.Module(self.__main))
+        self.modules.append(module.Module(self.__main))
 
     def load_modules_from_module_folder(self, verbose=True):
         """

@@ -7,12 +7,12 @@ __copyright__ = "Copyright 2018, Rhys Read"
 
 import logging
 import tkinter as tk
-import random
-import string
 import time
-import psutil
 
 from Modules.ModuleTemplate import ModuleTemplate
+
+# EVENT_CAP defines the maximum amount of events to be listed in the event box at once
+EVENT_CAP = 10
 
 
 class Module(ModuleTemplate):
@@ -22,9 +22,6 @@ class Module(ModuleTemplate):
     def start(self):
         logging.info('Starting GUI.')
         display = Display(self.main)
-
-        self.main.thread_manager.add_async_thread(display.random_loop)
-        self.main.thread_manager.add_async_thread(display.battery_loop)
 
         self.main.thread_manager.add_sync_thread(display.start)
 
@@ -40,60 +37,72 @@ class Display(object):
 
         self.__root = tk.Tk()
         self.__root.title('RhysRoom software')
-        self.__root.geometry('500x500')
 
-        self.__frame = tk.Frame(self.__root)
-        self.__frame.pack()
+        self.__label0 = tk.Label(self.__root, text='RhysRoom Software', font='Helvetica 18 bold')
+        self.__label0.grid(row=0, column=1)
 
-        self.__labels = [tk.Label(self.__frame, text=random_text(25)) for i in range(0, 5)]
-        [i.pack() for i in self.__labels]
+        self.__label1 = tk.Label(self.__root, text='Events:', font='Helvetica 16 bold')
+        self.__label1.grid(row=1, column=0)
 
-        self.__battery_level = tk.Label(self.__frame,
-                                        text='')
-        self.__battery_level.pack()
+        self.__label2 = tk.Label(self.__root, text='Active Modules:', font='Helvetica 16 bold')
+        self.__label2.grid(row=1, column=1)
 
-        button = tk.Button(self.__frame,
-                           text='QUIT',
-                           fg='red',
-                           command=self.__exit)
-        button.pack()
+        self.__label3 = tk.Label(self.__root, text='Disabled Modules:', font='Helvetica 16 bold')
+        self.__label3.grid(row=1, column=2)
+
+        self.time0 = tk.Label(self.__root, text=time.strftime('%H:%M:%S'), font='Helvetica 100 bold', fg='Navy')
+        self.main.thread_manager.add_async_thread(time_loop, args=(self,))
+        self.time0.grid(row=2, column=4)
+
+        self.__events0 = tk.Listbox(self.__root)
+        self.__events0.grid(row=2, column=0)
+
+        # Todo: Test if event limiter even works
+        self.__events0_amount = 0
+
+        self.__active_modules0 = tk.Listbox(self.__root)
+        self.__active_modules0.grid(row=2, column=1)
+
+        self.__disabled_modules0 = tk.Listbox(self.__root)
+        self.__disabled_modules0.grid(row=2, column=2)
+
+        for module in main.module_manager.modules:
+            self.add_active_module(module.get_name())
 
     def start(self):
         self.__root.mainloop()
+        self.__exit()
 
-    def __update(self):
+    def add_active_module(self, module_name: str):
+        self.__active_modules0.insert(0, module_name)
+        self.update()
+
+    def add_event(self, event_text: str):
+        # Todo: Integrate limit into this
+        self.__events0.insert(0, event_text)
+
+        self.__events0_amount += 1
+
+        if self.__events0_amount > EVENT_CAP:
+            self.__events0.delete(EVENT_CAP)
+            self.__events0_amount -= 1
+
+        self.update()
+
+    def update(self):
         if not self.active:
             return
         self.__root.update()
 
-    def random_loop(self):
-        # Todo: Research threading module a bit more to be more confident with threads and cores
-        while self.active:
-            self.__update()
-
-            # Broad exception clause to handle unexpected closure
-            try:
-                [i.config(text=random_text(25)) for i in self.__labels]
-            except:
-                pass
-            time.sleep(0.01)
-
-    def battery_loop(self):
-        while self.active:
-            self.__update()
-
-            # Broad exception clause to handle unexpected closure
-            try:
-                battery = psutil.sensors_battery()
-                self.__battery_level.config(text=str(battery.percent))
-            except:
-                pass
-
     def __exit(self):
         self.active = False
         self.main.active = False
-        self.__root.destroy()
 
 
-def random_text(length):
-    return ''.join([random.choice(string.ascii_letters) for i in range(0, length)])
+# Todo: Re-do this code so that it's not spaghetti, it's a bit hacky right now
+def time_loop(display_module: Display):
+    while display_module.main.active:
+        display_module.time0.config(text=time.strftime('%H:%M:%S'))
+        time.sleep(0.01)
+        display_module.update()
+
