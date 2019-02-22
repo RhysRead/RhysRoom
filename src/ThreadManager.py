@@ -6,7 +6,6 @@ import time
 __author__ = "Rhys Read"
 __copyright__ = "Copyright 2018, Rhys Read"
 
-import logging
 import threading
 
 

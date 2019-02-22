@@ -71,9 +71,16 @@ class Display(object):
         self.main.thread_manager.add_async_thread(date_loop, args=(self,))
         self.date0.grid(row=3, column=4)
 
+        self.day0 = tk.Label(self.__root,
+                             text=datetime.datetime.now().strftime('%A'),
+                             font='Helvetica 50',
+                             fg='Blue')
+        self.main.thread_manager.add_async_thread(day_loop, args=(self,))
+        self.day0.grid(row=4, column=4)
+
         self.uptime0 = tk.Label(self.__root,
-                                text='Uptime: {}',
-                                font='Helvetica 30 ',
+                                text='',
+                                font='Helvetica 20',
                                 fg='Navy')
         self.main.thread_manager.add_async_thread(uptime_loop, args=(self,))
         self.uptime0.grid(row=3, column=1)
@@ -142,13 +149,24 @@ def date_loop(display_module: Display):
         display_module.update()
 
 
+def day_loop(display_module: Display):
+    display_module.day0.config(text=datetime.datetime.now().strftime('%A'))
+    time.sleep(3600)
+    display_module.update()
+
+
 def uptime_loop(display_module: Display):
     while display_module.main.active:
         elapsed_time = time.time() - display_module.start_time
+        # Todo: Fix minutes exceeding max limit
         unformatted_time = [elapsed_time // 3600, elapsed_time // 60, elapsed_time % 60]
+
+        # Removes issue of minutes value being > 60
+        if unformatted_time[1] > 60:
+            unformatted_time[1] = unformatted_time[1] % 60
 
         formatted_time = ':'.join([str(round(i)) for i in unformatted_time])
 
-        display_module.uptime0.config(text='Uptime: {}'.format(formatted_time))
+        display_module.uptime0.config(text='Uptime {}'.format(formatted_time))
 
         time.sleep(1)
