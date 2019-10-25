@@ -6,6 +6,7 @@ __author__ = "Rhys Read"
 __copyright__ = "Copyright 2018, Rhys Read"
 
 import logging
+import os
 
 from ModuleManager import ModuleManager
 from ThreadManager import ThreadManager
@@ -25,6 +26,14 @@ class Main(object):
 
         while self.active:
             self.thread_manager.check_scheduled()
+
+            if not self.active:
+                self.__exit()
+
+    def __exit(self):
+        self.thread_manager.stop_all()
+        # Hacky way to get a clean exit when exiting through the display exit button:
+        os._exit(0)
 
 
 if __name__ == "__main__":
